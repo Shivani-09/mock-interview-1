@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>String Reverser</title>
+    <!-- Use Tailwind CSS for a modern, responsive design -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        .container {
+            max-width: 900px;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+
+    <!-- Main container for the application -->
+    <div class="container mx-auto p-8 bg-white rounded-3xl shadow-xl space-y-8">
+        <h1 class="text-4xl font-extrabold text-center text-gray-800 mb-6">String Reverser</h1>
+
+        <!-- Input and actions for String Reverser -->
+        <div class="p-6 bg-gray-50 rounded-2xl border border-gray-200 shadow-md">
+            <h2 class="text-2xl font-bold text-gray-700 mb-4">Add a String to Reverse</h2>
+            <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
+                <input
+                    type="text"
+                    id="stringInput"
+                    placeholder="Type your string here..."
+                    class="flex-1 p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow"
+                >
+                <button id="submitButton" class="px-6 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-colors shadow-lg">
+                    Add String
+                </button>
+            </div>
+             <!-- Error message box -->
+            <div id="errorBox" class="hidden p-4 mt-4 bg-red-100 border border-red-400 text-red-700 rounded-xl" role="alert">
+                <p id="errorMessage"></p>
+            </div>
+            <div id="editButtons" class="mt-4 hidden flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2">
+                <button id="cancelButton" class="px-4 py-2 bg-red-500 text-white font-semibold rounded-xl hover:bg-red-600 transition-colors shadow-lg">
+                    Cancel Edit
+                </button>
+                <button id="clearButton" class="px-4 py-2 bg-gray-400 text-white font-semibold rounded-xl hover:bg-gray-500 transition-colors shadow-lg">
+                    Clear Input
+                </button>
+            </div>
+        </div>
+
+        <!-- List of reversed strings section -->
+        <div class="p-6 bg-gray-50 rounded-2xl border border-gray-200 shadow-md">
+            <h2 class="text-2xl font-bold text-gray-700 mb-4">Saved Reversed Strings</h2>
+            <div id="stringList" class="space-y-4">
+                <!-- Reversed strings will be dynamically added here -->
+            </div>
+            <p id="loadingMessage" class="text-center text-gray-500 italic mt-4">Loading strings...</p>
+        </div>
+    </div>
+
+    <script src="reverse.js"></script>
+
+</body>
+</html>
