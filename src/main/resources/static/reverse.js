@@ -1,4 +1,5 @@
 const BASE_URL = 'http://localhost:8089';
+const reverseString_api = '/api/reverse';
 
 // --- DOM Elements for String Reverser ---
 const stringInput = document.getElementById('stringInput');
@@ -45,7 +46,7 @@ async function fetchStrings() {
     clearError();
     loadingMessage.classList.remove('hidden');
     try {
-        const response = await fetch(`${BASE_URL}/reverse`);
+        const response = await fetch(`${BASE_URL}${reverseString_api}`);
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
@@ -102,7 +103,7 @@ function renderStrings(strings) {
 // Function to handle adding a new reversed string
 async function addString(input) {
     try {
-        const response = await fetch(`${BASE_URL}/reverse`, {
+        const response = await fetch(`${BASE_URL}${reverseString_api}/add`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ inputDto: input })
@@ -122,7 +123,7 @@ async function addString(input) {
 // Function to handle updating an existing reversed string
 async function updateString(id, input) {
     try {
-        const response = await fetch(`${BASE_URL}/reverse/${id}`, {
+        const response = await fetch(`${BASE_URL}/api/reverse/${id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ inputDto: input })
@@ -166,7 +167,7 @@ async function handleDelete(id) {
     confirmBtn.addEventListener('click', async () => {
         modal.remove(); // Close modal
         try {
-            const response = await fetch(`${BASE_URL}/reverse/${id}`, {
+            const response = await fetch(`${BASE_URL}${reverseString_api}/${id}`, {
                 method: 'DELETE'
             });
             if (!response.ok) {
