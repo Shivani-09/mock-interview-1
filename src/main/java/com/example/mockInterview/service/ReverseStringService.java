@@ -24,11 +24,11 @@ public class ReverseStringService {
 	@PersistenceContext
 	private EntityManager entityManager;
 
-	public ReverseString reverseAndSave(String inputDto) {
+	public void reverseAndSave(String inputDto) {
 
 		String reversedString = new StringBuilder(inputDto).reverse().toString();
 		ReverseString entity = new ReverseString(inputDto, reversedString);
-		return reverseStringRepository.save(entity);
+		reverseStringRepository.save(entity);
 	}
 
 	public List<ReverseString> getString() {
@@ -70,4 +70,16 @@ public class ReverseStringService {
 		reverseStringRepository.deleteById(id);
 		return "Successfully deleted.!";
 	}
+	
+	//------using sql query as string ----------
+	
+	public String reverseAndSaveString(String originalString) {
+		
+        String reversedString = new StringBuilder(originalString).reverse().toString();
+
+        reverseStringRepository.addReverseString(originalString, reversedString);
+        
+        return reversedString;
+    }
+	
 }

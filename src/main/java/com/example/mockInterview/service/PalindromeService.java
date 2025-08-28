@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import com.example.mockInterview.controller.InputDto;
 import com.example.mockInterview.model.Palindrome;
-import com.example.mockInterview.model.ReverseString;
 import com.example.mockInterview.repository.PalindromeRepository;
 
 import jakarta.persistence.EntityManager;

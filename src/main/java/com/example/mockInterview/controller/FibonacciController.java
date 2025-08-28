@@ -41,8 +41,6 @@ public class FibonacciController {
 		
 		long id = requestDto.getId();
         int inputNum = requestDto.getN();
-//        
-//		long numDto = fibonacciService.createFiboIterationNum(inputNum);
 		
 		fibonacciService.updateFiboSeries(id, inputNum);
 		return ("updated successfully!");

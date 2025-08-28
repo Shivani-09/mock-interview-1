@@ -47,6 +47,22 @@ public class FactorialController {
 
 		return ResponseEntity.ok(factorialModel);
 	}
+	
+	@PutMapping("/factorial/UsingNativeQuery")
+	public ResponseEntity<Integer> updateFactUsingNativeQuery(@RequestBody FactorialDto request) {
+		
+		Integer result = factorialService.updateFactorialResult(request.getId(), request.getInput());
+		
+		return ResponseEntity.ok(result);
+	}
+	
+	@PutMapping("/factorial/UsingSession")
+	public ResponseEntity<String> updateFactUsingSession(@RequestBody FactorialDto request) {
+		
+		String result = factorialService.updateUsingEntity(request.getId(), request.getInput());
+		
+		return ResponseEntity.ok(result);
+	}	
 
 	@DeleteMapping("/factorial")
 	public ResponseEntity<Void> deleteFactResult(@RequestBody FactorialDto request) {

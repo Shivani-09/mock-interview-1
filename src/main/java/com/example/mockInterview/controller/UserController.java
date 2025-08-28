@@ -34,10 +34,11 @@ public class UserController {
 		return reverseStringService.getString();
 	}
 	
-	@PostMapping("/reverse/add")
-	public ReverseString addString(@RequestBody InputDto inputDto) {
-		return reverseStringService.reverseAndSave(inputDto.getInputDto());
-	}
+//	@PostMapping("/reverse/add")
+//	public void addString(@RequestBody Map<String, String> request) {
+//		String a = request.get("input");
+//		reverseStringService.reverseAndSave(a);
+//	}
 	
 	@PutMapping("/reverse/{id}")
 	public ResponseEntity<ReverseString> updatedString(@PathVariable long id, @RequestBody InputDto inputDto){
@@ -67,6 +68,17 @@ public class UserController {
 		Long id = Long.valueOf(request.get("id").toString());
 		return reverseStringService.delete(id);
 	}
+	
+	//-- this method gives sql query function--
+	@PostMapping("/reverse/SQL")
+    public ResponseEntity<ReverseString> reverseString(@RequestBody InputDto request) {
+        // The controller's responsibility is to delegate the business logic.
+        // It calls the service layer to reverse the string and handle the saving.
+        String reversedString = reverseStringService.reverseAndSaveString(request.getInputDto());
+        
+        // Return a successful response entity containing the reversed string.
+        return ResponseEntity.ok(new ReverseString(request.getInputDto(), reversedString));
+    }
 	
 	
 	//Palindrome starts here

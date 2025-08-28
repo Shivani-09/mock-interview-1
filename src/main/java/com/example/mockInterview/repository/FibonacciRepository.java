@@ -19,7 +19,7 @@ public interface FibonacciRepository extends JpaRepository<FibonacciModel, Long>
 
 	@Modifying
 	@Transactional
-	@Query(value = "insert into fibonacci_results (n, fib_number) Values(:n, :fibNumber))", nativeQuery = true)
+	@Query(value = "insert into fibonacci_results (n, fib_number) Values(:n, :fibNumber)", nativeQuery = true)
 	int saveUsingNativeQuery(@Param("n") int n, @Param("fibNumber") Long fibNumber);
 
 	@Modifying
