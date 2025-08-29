@@ -3,15 +3,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // Get DOM elements
     const stringInput = document.getElementById('stringInput');
     const submitButton = document.getElementById('submitButton');
-    const stringList = document.getElementById('stringList');
     const loadingMessage = document.getElementById('loadingMessage');
     const errorBox = document.getElementById('errorBox');
     const errorMessage = document.getElementById('errorMessage');
+    const primeForm = document.getElementById('primeForm');
+    const csvFile = document.getElementById('csvFile');
+    const primeResultsBody = document.getElementById('prime-results-body');
     const editButtons = document.getElementById('editButtons');
     const cancelButton = document.getElementById('cancelButton');
     const clearButton = document.getElementById('clearButton');
-    const primeForm = document.getElementById('primeForm');
-    const csvFile = document.getElementById('csvFile');
 
     // API endpoint constants
     const BASE_URL = 'http://localhost:8089/api/prime';
@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const resetForm = () => {
         stringInput.value = '';
         submitButton.textContent = 'Submit';
-        if (editButtons) { // Check if the element exists
+        if (editButtons) {
             editButtons.classList.add('hidden');
         }
         editingId = null;
@@ -51,47 +51,85 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    const renderPrimeNumbers = (primes) => {
-        stringList.innerHTML = ''; // Clear previous list
-        if (primes.length === 0) {
-            stringList.innerHTML = '<p class="text-gray-500 italic">No results yet. Enter a number to start!</p>';
-            return;
+    function showToast(message) {
+        const toast = document.getElementById('toast-message');
+        if (toast) {
+            toast.innerText = message;
+            toast.style.display = 'block';
+            toast.style.opacity = '1';
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => {
+                    toast.style.display = 'none';
+                }, 500);
+            }, 5000);
         }
+    }
 
-        primes.forEach(prime => {
-            const item = document.createElement('div');
-            item.className = 'flex items-center justify-between p-4 bg-white rounded-xl shadow-sm border border-gray-200';
-            item.innerHTML = `
-                <div>
-                    <span class="font-semibold text-gray-500 text-sm">ID: ${prime.id}</span>
-                    <span class="font-semibold text-gray-800">Number: ${prime.input}</span>
-                    <span class="ml-4 font-semibold text-sm ${prime.primeCheck ? 'text-green-600' : 'text-red-600'}">
-                        ${prime.primeCheck ? 'Prime' : 'Not Prime'}
-                    </span>
-                </div>
-                <div class="flex space-x-2">
-                    <button class="edit-btn px-4 py-2 text-sm font-medium text-blue-600 rounded-lg hover:bg-blue-100 transition-colors" data-id="${prime.id}" data-input="${prime.input}">Edit</button>
-                    <button class="delete-btn px-4 py-2 text-sm font-medium text-red-600 rounded-lg hover:bg-red-100 transition-colors" data-id="${prime.id}">Delete</button>
-                </div>
-            `;
-            stringList.appendChild(item);
-        });
-    };
+    // --- Fetch and Render Results ---
 
-    const fetchPrimeNumbers = async () => {
+    const fetchPrimeResults = async () => {
         if (loadingMessage) {
             loadingMessage.classList.remove('hidden');
         }
+        primeResultsBody.innerHTML = ''; // Clear previous results
+        
         try {
-            const response = await fetch(BASE_URL);
+            const response = await fetch('http://localhost:8089/api/prime');
+            
             if (!response.ok) {
-                throw new Error('Failed to fetch prime numbers.');
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
+            
             const primes = await response.json();
-            renderPrimeNumbers(primes);
+            
+            if (primes.length > 0) {
+                primes.forEach(prime => {
+                    const row = document.createElement('tr');
+                    
+                    const idCell = document.createElement('td');
+                    idCell.innerText = prime.id;
+                    row.appendChild(idCell);
+
+                    const inputCell = document.createElement('td');
+                    inputCell.innerText = prime.input;
+                    row.appendChild(inputCell);
+
+                    const primeCheckCell = document.createElement('td');
+                    primeCheckCell.innerHTML = `<span class="${prime.primeCheck ? 'is-prime' : 'not-prime'}">${prime.primeCheck ? 'Prime' : 'Not Prime'}</span>`;
+                    row.appendChild(primeCheckCell);
+
+                    const s3PathCell = document.createElement('td');
+                    if (prime.s3Path) {
+                        s3PathCell.innerHTML = `<a href="${prime.s3Path}" target="_blank">View File</a>`;
+                    } else {
+                        s3PathCell.innerText = '-';
+                    }
+                    row.appendChild(s3PathCell);
+                    
+                    const actionsCell = document.createElement('td');
+                    actionsCell.innerHTML = `<a href="#" class="edit-btn" data-id="${prime.id}" data-input="${prime.input}">Edit</a> | <a href="#" class="delete-btn" data-id="${prime.id}">Delete</a>`;
+                    row.appendChild(actionsCell);
+
+                    primeResultsBody.appendChild(row);
+                });
+            } else {
+                const row = document.createElement('tr');
+                const cell = document.createElement('td');
+                cell.setAttribute('colspan', '5');
+                cell.innerText = 'No prime numbers found.';
+                row.appendChild(cell);
+                primeResultsBody.appendChild(row);
+            }
         } catch (error) {
-            showError('Could not connect to the API. Please check the server.');
-            console.error('Fetch error:', error);
+            console.error('Failed to fetch prime results:', error);
+            const row = document.createElement('tr');
+            const cell = document.createElement('td');
+            cell.setAttribute('colspan', '5');
+            cell.innerText = 'Failed to load results. Please try again later.';
+            row.appendChild(cell);
+            primeResultsBody.appendChild(row);
         } finally {
             if (loadingMessage) {
                 loadingMessage.classList.add('hidden');
@@ -113,7 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error('Failed to save the number.');
             }
 
-            await fetchPrimeNumbers();
+            await fetchPrimeResults();
             resetForm();
         } catch (error) {
             showError(error.message);
@@ -133,7 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error('Failed to update the number.');
             }
 
-            await fetchPrimeNumbers();
+            await fetchPrimeResults();
             resetForm();
         } catch (error) {
             showError(error.message);
@@ -153,14 +191,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error('Failed to delete the number.');
             }
 
-            await fetchPrimeNumbers();
+            await fetchPrimeResults();
         } catch (error) {
             showError(error.message);
             console.error('Delete error:', error);
         }
     };
-
-    // --- New Upload Function ---
 
     const uploadFile = async (file) => {
         if (loadingMessage) {
@@ -174,22 +210,20 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const response = await fetch(UPLOAD_URL, {
                 method: 'POST',
-                body: formData,
+                body: formData
             });
 
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(errorText || 'Failed to upload the file.');
+            if (response.ok) {
+                const message = await response.text();
+                showToast(message);
+                await fetchPrimeResults(); 
+                resetForm(); 
+            } else {
+                const error = await response.text();
+                showToast("Error: " + error);
             }
-
-            const successMessage = await response.text();
-            alert(successMessage);
-
-            await fetchPrimeNumbers();
-            resetForm();
         } catch (error) {
-            showError(error.message);
-            console.error('Upload error:', error);
+            showToast("Network Error: " + error.message);
         } finally {
             if (loadingMessage) {
                 loadingMessage.classList.add('hidden');
@@ -199,17 +233,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Event Listeners ---
 
-    // Use a single event listener on the form to handle both scenarios
     if (primeForm) {
         primeForm.addEventListener('submit', (e) => {
             e.preventDefault();
 
             if (csvFile && csvFile.files.length > 0) {
                 const file = csvFile.files[0];
+                const allowedExtensions = ['.csv', '.xlsx', '.txt'];
+                const fileExtension = file.name.toLowerCase().substring(file.name.lastIndexOf('.'));
 
-                if (file.type && file.type !== 'text/csv' && !file.name.endsWith('.csv')) {
-                     showError('The selected file is not a CSV file.');
-                     return;
+                if (!allowedExtensions.includes(fileExtension)) {
+                    showError('The selected file is not a CSV, TXT, or XLSX file.');
+                    return;
                 }
                 uploadFile(file);
             } else {
@@ -227,10 +262,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    if (stringList) {
-        stringList.addEventListener('click', (e) => {
+    // Use event delegation for dynamically created buttons
+    if (primeResultsBody) {
+        primeResultsBody.addEventListener('click', (e) => {
             const target = e.target;
             if (target.classList.contains('edit-btn')) {
+                e.preventDefault();
                 editingId = target.dataset.id;
                 const input = target.dataset.input;
                 stringInput.value = input;
@@ -241,6 +278,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 stringInput.focus();
                 hideError();
             } else if (target.classList.contains('delete-btn')) {
+                e.preventDefault();
                 if (confirm('Are you sure you want to delete this record?')) {
                     deletePrimeNumber(target.dataset.id);
                 }
@@ -260,7 +298,7 @@ document.addEventListener('DOMContentLoaded', () => {
             stringInput.focus();
         });
     }
-    
+
     // Initial fetch of prime numbers when the page loads
-    fetchPrimeNumbers();
+    fetchPrimeResults();
 });
