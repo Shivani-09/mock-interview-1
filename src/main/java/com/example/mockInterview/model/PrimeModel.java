@@ -1,5 +1,6 @@
 package com.example.mockInterview.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -17,6 +18,9 @@ public class PrimeModel {
 	
 	private int input;
 	private boolean primeCheck;
+	
+	@Column(name = "s3_path")
+    private String s3Path;
 	
 	public long getId() {
 		return Id;
@@ -44,6 +48,18 @@ public class PrimeModel {
 	public PrimeModel() {
 		
 	}
+	public String getS3Path() {
+		return s3Path;
+	}
+	public void setS3Path(String s3Path) {
+		this.s3Path = s3Path;
+	}
+	public PrimeModel(int input, boolean primeCheck, String s3Path) {
+		this.input = input;
+		this.primeCheck = primeCheck;
+		this.s3Path = s3Path;
+	}
+	
 	
 	
 	
