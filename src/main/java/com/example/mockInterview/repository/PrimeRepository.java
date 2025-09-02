@@ -19,8 +19,8 @@ public interface PrimeRepository extends JpaRepository<PrimeModel, Long>{
 	
 	@Modifying
 	@Transactional
-	@Query(value = "insert into Prime (input, prime_check) Values (:input, :prime_check);", nativeQuery = true)
-	int savePrime(@Param ("input") int input, @Param("prime_check") boolean prime_check);
+	@Query(value = "insert into Prime (input, prime_check, s3_path) Values (:input, :prime_check, :s3_path);", nativeQuery = true)
+	int savePrime(@Param ("input") int input, @Param("prime_check") boolean prime_check, @Param("s3_path") String s3Path);
 	
 	@Modifying
 	@Transactional
